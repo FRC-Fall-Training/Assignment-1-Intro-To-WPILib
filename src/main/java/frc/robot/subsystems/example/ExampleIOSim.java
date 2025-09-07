@@ -1,4 +1,4 @@
-package frc.robot.subsystems.endeffector;
+package frc.robot.subsystems.example;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -7,40 +7,35 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import frc.robot.Constants;
 
-public class EndEffectorIOSim implements EndEffectorIO {
+public class ExampleIOSim implements ExampleIO {
   private final DCMotorSim motor;
   private final DCMotor gearbox;
   private double appliedVoltage = 0.0;
 
-  public EndEffectorIOSim() {
+  public ExampleIOSim() {
     gearbox = DCMotor.getKrakenX60Foc(1);
     motor =
         new DCMotorSim(
-            LinearSystemId.createDCMotorSystem(gearbox, 0.01, EndEffectorConstants.GEARING),
+            LinearSystemId.createDCMotorSystem(gearbox, 0.01, ExampleConstants.GEAR_RATIO),
             gearbox); // idk moi
   }
 
   @Override
-  public void updateInputs(EndEffectorIOInputs inputs) {
+  public void updateInputs(ExampleIOInputs inputs) {
     if (DriverStation.isDisabled()) {
       runVolts(0.0);
     }
 
     motor.update(Constants.loopPeriodSecs);
     inputs.data =
-        new EndEffectorIOData(
-            motor.getAngularPositionRad(),
-            motor.getAngularVelocityRadPerSec(),
+        new ExampleIOData(
+            motor.getAngularPositionRotations(),
+            motor.getAngularVelocityRPM(),
             appliedVoltage,
             motor.getCurrentDrawAmps(),
-            gearbox.getCurrent(motor.getAngularVelocityRadPerSec(), appliedVoltage),
+            gearbox.getCurrent(motor.getAngularVelocityRPM(), appliedVoltage),
             0.0,
-            false,
-            true, // Find a better way... Maybe just a toggle on smart dashboard for testing
-            // algortithm.
-            true, // Find a better way... Maybe just a toggle on smart dashboard for testing
-            // algortithm.
-            true);
+            false);
   }
 
   @Override
